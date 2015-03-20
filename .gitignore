@@ -113,3 +113,13 @@ qa/pull-tester/test.*/*
 /doc/doxygen/
 
 libbitcoinconsensus.pc
+
+
+.project
+.cproject
+.gitignore
+
+
+
+
+
