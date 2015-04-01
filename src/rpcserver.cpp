@@ -13,7 +13,7 @@
 #include "util.h"
 #include "utilstrencodings.h"
 #ifdef ENABLE_WALLET
-#include "wallet.h"
+#include "wallet/wallet.h"
 #endif
 
 #include <boost/algorithm/string.hpp>
@@ -333,6 +333,9 @@ static const CRPCCommand vRPCCommands[] =
     { "hidden",             "invalidateblock",        &invalidateblock,        true,      false },
     { "hidden",             "reconsiderblock",        &reconsiderblock,        true,      false },
     { "hidden",             "setmocktime",            &setmocktime,            true,      false },
+#ifdef ENABLE_WALLET
+    { "hidden", "resendwallettransactions", &resendwallettransactions, true, true },
+#endif
 
 #ifdef ENABLE_WALLET
     /* Wallet */

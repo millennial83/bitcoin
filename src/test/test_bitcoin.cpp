@@ -12,8 +12,8 @@
 #include "ui_interface.h"
 #include "util.h"
 #ifdef ENABLE_WALLET
-#include "db.h"
-#include "wallet.h"
+#include "wallet/db.h"
+#include "wallet/wallet.h"
 #endif
 
 #include <boost/filesystem.hpp>
@@ -28,7 +28,9 @@ extern void noui_connect();
 
 BasicTestingSetup::BasicTestingSetup()
 {
+        SetupEnvironment();
         fPrintToDebugLog = false; // don't want to write to debug.log file
+        fCheckBlockIndex = true;
         SelectParams(CBaseChainParams::MAIN);
 }
 BasicTestingSetup::~BasicTestingSetup()
