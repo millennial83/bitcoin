@@ -13,7 +13,7 @@
 
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
 {
-    unsigned int nProofOfWorkLimit = params.powLimit.GetCompact();
+    unsigned int nProofOfWorkLimit = UintToArith256(params.powLimit).GetCompact();
 
     // Genesis block
     if (pindexLast == NULL)
@@ -42,9 +42,9 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
     }
 
     // Go back by what we want to be 14 days worth of blocks
-    const CBlockIndex* pindexFirst = pindexLast;
-    for (int i = 0; pindexFirst && i < params.DifficultyAdjustmentInterval()-1; i++)
-        pindexFirst = pindexFirst->pprev;
+    int nHeightFirst = pindexLast->nHeight - (params.DifficultyAdjustmentInterval()-1);
+    assert(nHeightFirst >= 0);
+    const CBlockIndex* pindexFirst = pindexLast->GetAncestor(nHeightFirst);
     assert(pindexFirst);
 
     return CalculateNextWorkRequired(pindexLast, pindexFirst->GetBlockTime(), params);
@@ -61,6 +61,7 @@ unsigned int CalculateNextWorkRequired(const CBlockIndex* pindexLast, int64_t nF
         nActualTimespan = params.nPowTargetTimespan*4;
 
     // Retarget
+    const arith_uint256 bnPowLimit = UintToArith256(params.powLimit);
     arith_uint256 bnNew;
     arith_uint256 bnOld;
     bnNew.SetCompact(pindexLast->nBits);
@@ -68,8 +69,8 @@ unsigned int CalculateNextWorkRequired(const CBlockIndex* pindexLast, int64_t nF
     bnNew *= nActualTimespan;
     bnNew /= params.nPowTargetTimespan;
 
-    if (bnNew > params.powLimit)
-        bnNew = params.powLimit;
+    if (bnNew > bnPowLimit)
+        bnNew = bnPowLimit;
 
     /// debug print
     LogPrintf("GetNextWorkRequired RETARGET\n");
@@ -89,7 +90,7 @@ bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params&
     bnTarget.SetCompact(nBits, &fNegative, &fOverflow);
 
     // Check range
-    if (fNegative || bnTarget == 0 || fOverflow || bnTarget > params.powLimit)
+    if (fNegative || bnTarget == 0 || fOverflow || bnTarget > UintToArith256(params.powLimit))
         return error("CheckProofOfWork(): nBits below minimum work");
 
     // Check proof of work matches claimed amount
