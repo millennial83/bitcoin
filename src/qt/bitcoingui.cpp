@@ -164,7 +164,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle *networkStyle, QWidget *parent) :
 
     // Create status bar
     statusBar();
-    
+
     // Disable size grip because it looks ugly and nobody needs it
     statusBar()->setSizeGripEnabled(false);
 
@@ -684,7 +684,7 @@ void BitcoinGUI::setNumBlocks(int count, const QDateTime& blockDate)
     QDateTime currentDate = QDateTime::currentDateTime();
     qint64 secs = blockDate.secsTo(currentDate);
 
-    tooltip = tr("Processed %n blocks of transaction history.", "", count);
+    tooltip = tr("Processed %n block(s) of transaction history.", "", count);
 
     // Set icon state: spinning if catching up, tick otherwise
     if(secs < 90*60)
