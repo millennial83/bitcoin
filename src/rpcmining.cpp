@@ -6,6 +6,7 @@
 #include "amount.h"
 #include "chainparams.h"
 #include "consensus/consensus.h"
+#include "consensus/validation.h"
 #include "core_io.h"
 #include "init.h"
 #include "main.h"
@@ -16,7 +17,6 @@
 #include "util.h"
 #include "validationinterface.h"
 #ifdef ENABLE_WALLET
-#include "wallet/db.h"
 #include "wallet/wallet.h"
 #endif
 
@@ -164,7 +164,7 @@ Value generate(const Array& params, bool fHelp)
             ++pblock->nNonce;
         }
         CValidationState state;
-        if (!ProcessNewBlock(state, NULL, pblock))
+        if (!ProcessNewBlock(state, NULL, pblock, true, NULL))
             throw JSONRPCError(RPC_INTERNAL_ERROR, "ProcessNewBlock, block not accepted");
         ++nHeight;
         blockHashes.push_back(pblock->GetHash().GetHex());
@@ -650,7 +650,7 @@ Value submitblock(const Array& params, bool fHelp)
     CValidationState state;
     submitblock_StateCatcher sc(block.GetHash());
     RegisterValidationInterface(&sc);
-    bool fAccepted = ProcessNewBlock(state, NULL, &block);
+    bool fAccepted = ProcessNewBlock(state, NULL, &block, true, NULL);
     UnregisterValidationInterface(&sc);
     if (fBlockPresent)
     {
